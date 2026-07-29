@@ -292,6 +292,7 @@ button {
   background: var(--ivory-deep);
   border-radius: var(--radius);
 }
+.frame--video { cursor: pointer; }
 .frame img, .frame video {
   width: 100%;
   height: 100%;
