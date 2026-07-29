@@ -118,29 +118,27 @@ button {
   color: var(--ivory);
 }
 .hero__media {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.55;
+  display: none;
 }
-.hero__media--fallback {
-  background:
-    radial-gradient(circle at 18% 20%, rgba(185,106,77,0.35), transparent 45%),
-    radial-gradient(circle at 82% 78%, rgba(124,129,97,0.30), transparent 50%),
-    var(--ink);
+.hero__grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr minmax(300px, 440px);
+  gap: 64px;
+  align-items: center;
+  padding: 140px 0 96px;
+  min-height: 100vh;
 }
-.hero__scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(42,33,24,0.15) 0%, rgba(42,33,24,0.75) 100%);
+@media (max-width: 900px) {
+  .hero__grid {
+    grid-template-columns: 1fr;
+    padding: 120px 0 72px;
+    gap: 40px;
+  }
+  .hero__photo { order: -1; max-width: 320px; margin: 0 auto; }
 }
 .hero__content {
   position: relative;
-  padding: 0 var(--edge) 72px;
-  max-width: var(--max-w);
-  margin: 0 auto;
   width: 100%;
 }
 .hero__eyebrow {
@@ -154,12 +152,19 @@ button {
 .hero__name {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(2.6rem, 8vw, 5.6rem);
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
   line-height: 0.98;
-  margin: 0 0 24px;
+  margin: 0 0 20px;
   letter-spacing: -0.01em;
 }
-.hero__actions { display: flex; gap: 14px; flex-wrap: wrap; }
+.hero__bio {
+  font-size: 16px;
+  line-height: 1.75;
+  color: rgba(246,240,228,0.75);
+  max-width: 52ch;
+  margin: 0 0 32px;
+}
+.hero__actions { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 40px; }
 .btn {
   display: inline-flex;
   align-items: center;
@@ -178,6 +183,28 @@ button {
 .btn--solid:hover { background: var(--clay-deep); }
 .btn--ghost { border-color: rgba(246,240,228,0.45); color: var(--ivory); }
 .btn--ghost:hover { border-color: var(--ivory); }
+
+.hero__skills-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sand);
+  margin: 0 0 14px;
+}
+.skills--on-dark li {
+  border-color: rgba(246,240,228,0.25);
+  color: var(--ivory);
+  background: rgba(246,240,228,0.06);
+}
+
+.hero__photo {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--ivory-deep);
+}
+.hero__photo img { width: 100%; height: 100%; object-fit: cover; }
 
 .hero__scroll {
   position: absolute;
@@ -475,55 +502,8 @@ button {
 }
 
 /* ============================================================
-   ABOUT
+   SKILLS (usadas dentro del Hero)
    ============================================================ */
-.about {
-  display: grid;
-  grid-template-columns: minmax(280px, 460px) 1fr;
-  gap: 64px;
-  align-items: center;
-}
-@media (max-width: 900px) {
-  .about { grid-template-columns: 1fr; gap: 32px; }
-}
-.about__photo {
-  aspect-ratio: 3 / 4;
-  background: var(--ivory-deep);
-  overflow: hidden;
-  border-radius: var(--radius);
-}
-.about__photo img { width: 100%; height: 100%; object-fit: cover; }
-.about__content { max-width: 560px; }
-.about__name {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: clamp(2rem, 4.5vw, 3rem);
-  margin: 4px 0 6px;
-  letter-spacing: -0.01em;
-  line-height: 1.05;
-}
-.about__role {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ink-soft);
-  margin: 0 0 28px;
-}
-.about__bio {
-  font-size: 17px;
-  line-height: 1.75;
-  color: var(--ink-soft);
-  margin: 0 0 32px;
-}
-.about__skills-label {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--clay-deep);
-  margin: 0 0 14px;
-}
 .skills {
   display: flex;
   flex-wrap: wrap;
@@ -650,7 +630,7 @@ button {
     border-left-width: 9px;
   }
 
-  .about__bio { font-size: 15px; }
+  .hero__bio { font-size: 15px; }
   .skills li { font-size: 11.5px; padding: 8px 12px; }
 
   .contact__socials { gap: 18px; font-size: 12px; }
