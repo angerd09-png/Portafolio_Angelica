@@ -20,12 +20,31 @@ function BrandLogo({ brand }) {
 
 function Frame({ item, index }) {
   const isVideo = item.media_type === 'video'
+  const isLink = item.media_type === 'link'
+
+  if (isLink) {
+    return (
+      <a
+        className="frame frame--link"
+        href={item.media_url}
+        target="_blank"
+        rel="noreferrer"
+      >
+        <span className="frame__number">F.{String(index + 1).padStart(2, '0')}</span>
+        <div className="frame__link-content">
+          <span className="frame__play"><span>▶</span></span>
+          <span className="frame__link-label">{item.title || 'Ver video'}</span>
+        </div>
+      </a>
+    )
+  }
+
   return (
     <div className="frame">
       <span className="frame__number">F.{String(index + 1).padStart(2, '0')}</span>
       {isVideo ? (
         <>
-          <video src={item.media_url} muted loop playsInline preload="metadata" />
+          <video src={item.media_url} autoPlay muted loop playsInline preload="auto" />
           <div className="frame__play"><span>▶</span></div>
         </>
       ) : (
