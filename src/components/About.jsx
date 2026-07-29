@@ -11,17 +11,17 @@ const SKILLS = [
 // Coloca tu foto en /public/profile.jpg
 export default function About() {
   return (
-    <section id="sobre-mi" className="section section--tight">
+    <section id="sobre-mi" className="section">
       <div className="container">
-        <div className="section-head">
-          <p className="section-eyebrow">Sobre mí</p>
-          <h2 className="section-title">Angelica Ruiz</h2>
-        </div>
         <div className="about">
           <div className="about__photo">
             <img src="/profile.jpg" alt="Foto de Angelica Ruiz" />
           </div>
-          <div>
+          <div className="about__content">
+            <p className="section-eyebrow">Sobre mí</p>
+            <h2 className="about__name">Angelica Ruiz</h2>
+            <p className="about__role">Fotografía &amp; video</p>
+
             <p className="about__bio">
               Diseño, contenido y estrategia en un mismo perfil. Tengo experiencia
               creando y editando videos para Reels y contenido visual para redes
@@ -30,6 +30,8 @@ export default function About() {
               Internacionales, con experiencia en áreas comerciales y de marketing
               siempre orientadas al diseño y la comunicación visual.
             </p>
+
+            <p className="about__skills-label">Habilidades</p>
             <ul className="skills">
               {SKILLS.map((s) => (
                 <li key={s}>{s}</li>
