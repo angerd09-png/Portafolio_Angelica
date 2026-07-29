@@ -282,12 +282,12 @@ button {
 
 .frame-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: 18px;
 }
 .frame {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 9 / 16;
   overflow: hidden;
   background: var(--ivory-deep);
   border-radius: var(--radius);
@@ -329,6 +329,33 @@ button {
   justify-content: center;
   font-size: 14px;
   color: var(--ink);
+}
+
+/* Frame tipo "link" — video pesado alojado fuera (Instagram, YouTube, Vimeo) */
+.frame--link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  transition: background 0.2s ease;
+}
+.frame--link:hover { background: var(--clay-deep); }
+.frame__link-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: var(--ivory);
+  text-align: center;
+  padding: 0 16px;
+}
+.frame__link-content .frame__play {
+  position: static;
+}
+.frame__link-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
 }
 
 .empty-state {
