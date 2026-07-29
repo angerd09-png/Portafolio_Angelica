@@ -7,17 +7,17 @@ export const BRANDS = [
   {
     slug: 'aura-vibes',
     name: 'Aura Vibes',
-    description: 'Descripción breve de lo realizado para Aura Vibes.',
+    description: 'Elaboración de contenido post eventos.',
   },
   {
     slug: 'celeste',
     name: 'Celeste',
-    description: 'Descripción breve de lo realizado para Celeste.',
+    description: 'Creación, filmación y edición de contenido para historias, reels, banners de eventos, entre otros.',
   },
   {
     slug: 'nuestro-sueno',
     name: 'Nuestro Sueño',
-    description: 'Descripción breve de lo realizado para Nuestro Sueño.',
+    description: 'Creación, filmación y edición de contenido para historias, reels, banners de eventos, entre otros.',
   },
 ]
 
