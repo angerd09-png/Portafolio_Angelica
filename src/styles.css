@@ -257,19 +257,19 @@ button {
   margin-bottom: 28px;
 }
 .brand-block__logo {
-  height: 84px;
-  max-width: 260px;
+  height: 130px;
+  max-width: 340px;
   object-fit: contain;
   object-position: left center;
 }
 .brand-block__logo-placeholder {
-  height: 84px;
+  height: 130px;
   min-width: 120px;
   display: flex;
   align-items: center;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 32px;
+  font-size: 44px;
   color: var(--ink);
 }
 .brand-block__desc {
