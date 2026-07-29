@@ -70,6 +70,15 @@ function Frame({ item, index }) {
             loop
             playsInline
             preload="metadata"
+            onLoadedMetadata={(e) => {
+              // Adelanta una fracción de segundo para pintar un fotograma
+              // real como vista previa, sin reproducir el video.
+              try {
+                e.currentTarget.currentTime = 0.1
+              } catch {
+                // Algunos navegadores no permiten seek inmediato; se ignora.
+              }
+            }}
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
           />
