@@ -2,7 +2,6 @@ import Nav from './components/Nav'
 import Hero from './components/Hero'
 import SprocketStrip from './components/SprocketStrip'
 import Projects from './components/Projects'
-import About from './components/About'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 
@@ -11,8 +10,6 @@ export default function App() {
     <>
       <Nav />
       <Hero />
-      <SprocketStrip />
-      <About />
       <SprocketStrip />
       <Projects />
       <Contact />
