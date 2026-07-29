@@ -12,9 +12,9 @@ export default function App() {
       <Nav />
       <Hero />
       <SprocketStrip />
-      <Projects />
-      <SprocketStrip />
       <About />
+      <SprocketStrip />
+      <Projects />
       <Contact />
       <Footer />
     </>
