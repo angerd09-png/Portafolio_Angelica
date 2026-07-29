@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { BRANDS, useProjects } from '../lib/useProjects'
 
 // Coloca cada logo en /public/logos/{slug}.png (ej: /public/logos/aura-vibes.png).
@@ -21,6 +21,8 @@ function BrandLogo({ brand }) {
 function Frame({ item, index }) {
   const isVideo = item.media_type === 'video'
   const isLink = item.media_type === 'link'
+  const videoRef = useRef(null)
+  const [isPlaying, setIsPlaying] = useState(false)
 
   if (isLink) {
     return (
@@ -39,13 +41,41 @@ function Frame({ item, index }) {
     )
   }
 
+  function togglePlay() {
+    const el = videoRef.current
+    if (!el) return
+    if (el.paused) {
+      el.play()
+      setIsPlaying(true)
+    } else {
+      el.pause()
+      setIsPlaying(false)
+    }
+  }
+
   return (
-    <div className="frame">
+    <div
+      className={`frame ${isVideo ? 'frame--video' : ''}`}
+      onClick={isVideo ? togglePlay : undefined}
+      role={isVideo ? 'button' : undefined}
+      aria-label={isVideo ? (isPlaying ? 'Pausar video' : 'Reproducir video') : undefined}
+    >
       <span className="frame__number">F.{String(index + 1).padStart(2, '0')}</span>
       {isVideo ? (
         <>
-          <video src={item.media_url} autoPlay muted loop playsInline preload="auto" />
-          <div className="frame__play"><span>▶</span></div>
+          <video
+            ref={videoRef}
+            src={item.media_url}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+          />
+          {!isPlaying && (
+            <div className="frame__play"><span>▶</span></div>
+          )}
         </>
       ) : (
         <img src={item.media_url} alt={item.title || `Pieza para ${item.brand_name}`} loading="lazy" />
