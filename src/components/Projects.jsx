@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { BRANDS, useProjects } from '../lib/useProjects'
 
 // Coloca cada logo en /public/logos/{slug}.png (ej: /public/logos/aura-vibes.png).
@@ -18,11 +18,12 @@ function BrandLogo({ brand }) {
   )
 }
 
-function Frame({ item, index }) {
+// Miniatura dentro de la grilla. Fotos y videos abren el visor grande al
+// hacer clic; los enlaces externos (Drive, Instagram, etc.) siguen abriendo
+// en pestaña nueva, ya que no viven dentro del sitio.
+function Frame({ item, index, onOpen }) {
   const isVideo = item.media_type === 'video'
   const isLink = item.media_type === 'link'
-  const videoRef = useRef(null)
-  const [isPlaying, setIsPlaying] = useState(false)
 
   if (isLink) {
     return (
@@ -41,54 +42,100 @@ function Frame({ item, index }) {
     )
   }
 
-  function togglePlay() {
-    const el = videoRef.current
-    if (!el) return
-    if (el.paused) {
-      el.play()
-      setIsPlaying(true)
-    } else {
-      el.pause()
-      setIsPlaying(false)
-    }
-  }
-
   return (
     <div
       className={`frame ${isVideo ? 'frame--video' : ''}`}
-      onClick={isVideo ? togglePlay : undefined}
-      role={isVideo ? 'button' : undefined}
-      aria-label={isVideo ? (isPlaying ? 'Pausar video' : 'Reproducir video') : undefined}
+      onClick={onOpen}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter') onOpen() }}
+      aria-label={isVideo ? 'Ver video en grande' : 'Ver foto en grande'}
     >
       <span className="frame__number">F.{String(index + 1).padStart(2, '0')}</span>
       {isVideo ? (
-        <>
-          <video
-            ref={videoRef}
-            src={item.media_url}
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            onLoadedMetadata={(e) => {
-              // Adelanta una fracción de segundo para pintar un fotograma
-              // real como vista previa, sin reproducir el video.
-              try {
-                e.currentTarget.currentTime = 0.1
-              } catch {
-                // Algunos navegadores no permiten seek inmediato; se ignora.
-              }
-            }}
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-          />
-          {!isPlaying && (
-            <div className="frame__play"><span>▶</span></div>
-          )}
-        </>
+        <video
+          src={item.media_url}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          onLoadedMetadata={(e) => {
+            // Adelanta una fracción de segundo para pintar un fotograma
+            // real como vista previa, sin reproducir el video.
+            try {
+              e.currentTarget.currentTime = 0.1
+            } catch {
+              // Algunos navegadores no permiten seek inmediato; se ignora.
+            }
+          }}
+        />
       ) : (
         <img src={item.media_url} alt={item.title || `Pieza para ${item.brand_name}`} loading="lazy" />
       )}
+      {isVideo && (
+        <div className="frame__play"><span>▶</span></div>
+      )}
+    </div>
+  )
+}
+
+// Visor en grande. Recibe la lista de piezas visibles (fotos/videos, sin los
+// enlaces externos) y el índice actual, y permite navegar con flechas,
+// teclado o gestos de cierre.
+function Lightbox({ items, index, onClose, onPrev, onNext }) {
+  const item = items[index]
+
+  useEffect(() => {
+    function handleKey(e) {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowLeft') onPrev()
+      if (e.key === 'ArrowRight') onNext()
+    }
+    document.addEventListener('keydown', handleKey)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', handleKey)
+      document.body.style.overflow = ''
+    }
+  }, [onClose, onPrev, onNext])
+
+  if (!item) return null
+  const isVideo = item.media_type === 'video'
+
+  return (
+    <div className="lightbox" onClick={onClose}>
+      <button className="lightbox__close" onClick={onClose} aria-label="Cerrar">✕</button>
+
+      {items.length > 1 && (
+        <>
+          <button
+            className="lightbox__nav lightbox__nav--prev"
+            onClick={(e) => { e.stopPropagation(); onPrev() }}
+            aria-label="Anterior"
+          >
+            ‹
+          </button>
+          <button
+            className="lightbox__nav lightbox__nav--next"
+            onClick={(e) => { e.stopPropagation(); onNext() }}
+            aria-label="Siguiente"
+          >
+            ›
+          </button>
+        </>
+      )}
+
+      <div className="lightbox__stage" onClick={(e) => e.stopPropagation()}>
+        {isVideo ? (
+          <video src={item.media_url} controls autoPlay playsInline />
+        ) : (
+          <img src={item.media_url} alt={item.title || 'Pieza ampliada'} />
+        )}
+      </div>
+
+      <div className="lightbox__counter">
+        {index + 1} / {items.length}
+      </div>
     </div>
   )
 }
@@ -96,11 +143,16 @@ function Frame({ item, index }) {
 export default function Projects() {
   const { items, loading, error } = useProjects()
   const [activeBrand, setActiveBrand] = useState('todos')
+  const [lightbox, setLightbox] = useState(null) // { brandSlug, index }
 
   const visibleBrands = useMemo(
     () => (activeBrand === 'todos' ? BRANDS : BRANDS.filter((b) => b.slug === activeBrand)),
     [activeBrand]
   )
+
+  const lightboxItems = lightbox
+    ? items.filter((i) => i.brand_slug === lightbox.brandSlug && i.media_type !== 'link')
+    : []
 
   return (
     <section id="proyectos" className="section">
@@ -151,15 +203,39 @@ export default function Projects() {
                 </div>
               ) : (
                 <div className="frame-grid">
-                  {brandItems.map((item, idx) => (
-                    <Frame item={item} index={idx} key={item.id ?? idx} />
-                  ))}
+                  {brandItems.map((item, idx) => {
+                    if (item.media_type === 'link') {
+                      return <Frame item={item} index={idx} key={item.id ?? idx} />
+                    }
+                    return (
+                      <Frame
+                        item={item}
+                        index={idx}
+                        key={item.id ?? idx}
+                        onOpen={() => {
+                          const galleryItems = brandItems.filter((i) => i.media_type !== 'link')
+                          const galleryIndex = galleryItems.findIndex((i) => (i.id ?? i) === (item.id ?? item))
+                          setLightbox({ brandSlug: brand.slug, index: Math.max(galleryIndex, 0) })
+                        }}
+                      />
+                    )
+                  })}
                 </div>
               )}
             </div>
           )
         })}
       </div>
+
+      {lightbox && lightboxItems.length > 0 && (
+        <Lightbox
+          items={lightboxItems}
+          index={lightbox.index}
+          onClose={() => setLightbox(null)}
+          onPrev={() => setLightbox((s) => ({ ...s, index: (s.index - 1 + lightboxItems.length) % lightboxItems.length }))}
+          onNext={() => setLightbox((s) => ({ ...s, index: (s.index + 1) % lightboxItems.length }))}
+        />
+      )}
     </section>
   )
 }
